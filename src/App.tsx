@@ -6,7 +6,7 @@ function App() {
       <div className="container mx-auto">
         <h1 className="font-bold text-2xl text-center">LLM Rush</h1>
 
-        <Dropdown />
+        <Dropdown id="modelsDropdown"/>
       </div>
     </div>
   );
