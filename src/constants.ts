@@ -1,4 +1,18 @@
-type model = {
+export type message_sender = "user" | "assistant" | "system";
+
+export type message = {
+  id: number;
+  text: string;
+  role: message_sender;
+};
+
+export type loadingModelType = {
+  progress: number;
+  text: string;
+  timeElapsed: number;
+};
+
+export type model = {
   [key: string]: {
     modelName: string;
     displayName: string;

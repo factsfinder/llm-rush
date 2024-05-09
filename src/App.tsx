@@ -5,38 +5,18 @@ import Loading from "./Loading";
 
 function App() {
   const { state } = useAppContext();
-  const { loadingModelProgress, answer } = state;
-
   return (
     <div className="bg-white py-8 w-screen h-screen">
       <div className="container mx-auto">
-        <div className="relative flex flex-row items-center justify-center py-4">
-          <div className="absolute left-0">
-            <ModelsDropdown />
-          </div>
-          <h1 className="font-extrabold text-2xl text-black">LLM Rush</h1>
+        <div className="flex flex-col sm:flex-row-reverse items-center justify-between py-4">
+          <h1 className="font-extrabold text-2xl mx-auto text-black">
+            LLM Rush
+          </h1>
+          {!!state.engine && <ModelsDropdown />}
         </div>
-
-        {loadingModelProgress != null &&
-          loadingModelProgress?.progress != 1 && (
-            <div className="flex flex-col gap-2 justify-center">
-              <p className="text-primary">{loadingModelProgress.text}</p>
-
-              <progress
-                className="progress progress-primary w-56"
-                value={`${loadingModelProgress.progress * 100}`}
-                max="100"
-              ></progress>
-            </div>
-          )}
 
         <ChatScreen />
-
-        <div className="py-4">
-          <p>{answer}</p>
-        </div>
       </div>
-
       {state.loading && <Loading />}
     </div>
   );

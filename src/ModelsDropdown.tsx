@@ -1,10 +1,11 @@
 import { useEffect, useCallback } from "react";
+import { InitProgressReport } from "@mlc-ai/web-llm";
 
 import { useAppContext, actionTypes } from "./context";
 import { models } from "./constants";
 import useWebLLM from "./hooks/useWebLLM";
 
-function Dropdown() {
+function ModelsDropdown() {
   const { state, dispatch } = useAppContext();
 
   const { selectedModel } = state;
@@ -23,18 +24,40 @@ function Dropdown() {
     }
   }, []);
 
+  // to avoid unnecessary rerenders via state updates
+  const handleModelLoadProgress = (report: InitProgressReport) => {
+    const progressElem = document.getElementById("loadingProgress");
+    const progressTextElem = document.getElementById("loadingProgressText");
+    const progressBarElem = document.getElementById("loadingProgressBar");
+
+    if (progressElem != null) {
+      if (progressElem?.classList.contains("hidden")) {
+        progressElem.classList.remove("hidden");
+      }
+      if (report.progress == 1) {
+        progressElem?.classList.add("hidden");
+        // todo: display a toast
+      }
+    }
+
+    if (progressTextElem != null && progressBarElem != null) {
+      progressTextElem.innerText = report.text;
+      if (progressBarElem.classList.contains("hidden")) {
+        progressBarElem.classList.remove("hidden");
+        progressBarElem.classList.add("block");
+      }
+      if (report.progress > 0) {
+        progressBarElem.setAttribute("value", `${report.progress * 100}`);
+      }
+    }
+  };
+
   const handleSelectModel = (modelName: string) => {
     if (selectedModel !== modelName) {
       return async (e: any) => {
         closeDropdown(e);
         dispatch({ type: actionTypes.SELECT_MODEL, payload: modelName });
-
-        const engine = await loadEngine(modelName, (report) => {
-          dispatch({
-            type: actionTypes.LOADING_MODEL_PROGRESS,
-            payload: report,
-          });
-        });
+        const engine = await loadEngine(modelName, handleModelLoadProgress);
         dispatch({ type: actionTypes.UPDATE_LLM_ENGINE, payload: engine });
       };
     }
@@ -50,8 +73,8 @@ function Dropdown() {
 
   return (
     <details id="modelsDropdown" className="dropdown">
-      <summary className="m-1 btn btn-outline btn-md text-black">
-        {selectedModel || "Load LLM"}
+      <summary className="btn btn-primary text-white btn-sm ">
+        {selectedModel || "Select LLM"}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -87,4 +110,4 @@ function Dropdown() {
   );
 }
 
-export default Dropdown;
+export default ModelsDropdown;

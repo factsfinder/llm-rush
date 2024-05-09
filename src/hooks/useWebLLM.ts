@@ -55,6 +55,7 @@ function useWebLLM() {
       // engine.interruptGenerate();  // works with interrupt as well
       // console.log(await engine.runtimeStatsText());
     }
+    return message;
   };
 
   return { loadEngine, stream };
