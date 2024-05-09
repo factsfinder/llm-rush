@@ -9,7 +9,7 @@ function useIndexedDB() {
   ) {
     const openRequest = indexedDB.open(name, version);
     openRequest.onsuccess = () => {
-      dispatch({ type: actionTypes.UPDATE_DB, payload: openRequest.result });
+      updateDBAndLoadMessages(openRequest.result, objectStoreName, dispatch);
     };
     openRequest.onupgradeneeded = () => {
       const db = openRequest.result;
@@ -21,18 +21,7 @@ function useIndexedDB() {
         });
         dispatch({ type: actionTypes.UPDATE_DB, payload: db });
       } else {
-        dispatch({ type: actionTypes.UPDATE_DB, payload: db });
-        transactReadOnly(
-          db,
-          "messages",
-          null,
-          (result) => {
-            dispatch({ type: actionTypes.LOAD_MESSAGES, payload: result });
-          },
-          (error) => {
-            console.log(error); // todo: handle properly
-          }
-        );
+        updateDBAndLoadMessages(openRequest.result, objectStoreName, dispatch);
       }
     };
   }
@@ -86,6 +75,27 @@ function useIndexedDB() {
   ) {
     const transaction = db.transaction(storeName, "readwrite");
     transaction.objectStore(storeName).delete(key);
+  }
+
+  function updateDBAndLoadMessages(
+    db: IDBDatabase,
+    objectStoreName: string,
+    dispatch: any
+  ) {
+    dispatch({ type: actionTypes.UPDATE_DB, payload: db });
+    if (db.objectStoreNames.contains(objectStoreName)) {
+      transactReadOnly(
+        db,
+        objectStoreName,
+        null,
+        (result) => {
+          dispatch({ type: actionTypes.LOAD_MESSAGES, payload: result });
+        },
+        (error) => {
+          console.log(error); // todo: handle properly
+        }
+      );
+    }
   }
 
   return {
