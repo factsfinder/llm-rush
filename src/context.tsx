@@ -102,26 +102,10 @@ function appReducer(state: appStateType, action: appActionsType) {
 function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  const { initIndexedDB, transactReadOnly } = useIndexedDB();
+  const { initIndexedDB } = useIndexedDB();
 
   useEffect(() => {
-    initIndexedDB("llm-rush", 1, "messages", (db) => {
-      dispatch({ type: actionTypes.UPDATE_DB, payload: db });
-      if (db.objectStoreNames.contains("messages")) {
-        transactReadOnly(
-          db,
-          "messages",
-          null,
-          (result) => {
-            console.log(result);
-            dispatch({ type: actionTypes.LOAD_MESSAGES, payload: result });
-          },
-          (error) => {
-            console.log(error); // todo: handle properly
-          }
-        );
-      }
-    });
+    initIndexedDB("llm-rush", 1, "messages", dispatch);
   }, [dispatch]);
 
   return (

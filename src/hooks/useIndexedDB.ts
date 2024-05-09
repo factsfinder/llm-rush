@@ -1,13 +1,15 @@
+import { actionTypes } from "../context";
+
 function useIndexedDB() {
   function initIndexedDB(
     name: string,
     version: number,
     objectStoreName: string,
-    saveDB: (db: IDBDatabase) => void
+    dispatch: any
   ) {
     const openRequest = indexedDB.open(name, version);
     openRequest.onsuccess = () => {
-      saveDB(openRequest.result);
+      dispatch({ type: actionTypes.UPDATE_DB, payload: openRequest.result });
     };
     openRequest.onupgradeneeded = () => {
       const db = openRequest.result;
@@ -17,8 +19,21 @@ function useIndexedDB() {
           keyPath: "id",
           autoIncrement: true,
         });
+        dispatch({ type: actionTypes.UPDATE_DB, payload: db });
+      } else {
+        dispatch({ type: actionTypes.UPDATE_DB, payload: db });
+        transactReadOnly(
+          db,
+          "messages",
+          null,
+          (result) => {
+            dispatch({ type: actionTypes.LOAD_MESSAGES, payload: result });
+          },
+          (error) => {
+            console.log(error); // todo: handle properly
+          }
+        );
       }
-      saveDB(db);
     };
   }
 
@@ -32,7 +47,7 @@ function useIndexedDB() {
     let request = null;
     const transaction = db.transaction(storeName, "readonly");
     const objectStore = transaction.objectStore(storeName);
-    if (index != null) {
+    if (typeof index === "string") {
       const rowsIndex = objectStore.index(index);
       request = rowsIndex.getAll(); // todo: use cursor
     } else {
