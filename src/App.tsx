@@ -1,6 +1,7 @@
 import { useAppContext } from "./context";
 import ModelsDropdown from "./ModelsDropdown";
 import ChatScreen from "./Chat";
+import Loading from "./Loading";
 
 function App() {
   const { state } = useAppContext();
@@ -35,6 +36,8 @@ function App() {
           <p>{answer}</p>
         </div>
       </div>
+
+      {state.loading && <Loading />}
     </div>
   );
 }

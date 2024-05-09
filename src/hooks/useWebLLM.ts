@@ -5,20 +5,22 @@ function useWebLLM() {
     modelName: string,
     progressCallback: (report: webllm.InitProgressReport) => void
   ) => {
-    const engine: webllm.EngineInterface = await webllm.CreateWebWorkerEngine(
-      new Worker(new URL("../worker.ts", import.meta.url), { type: "module" }),
+    const appConfig = {
+      ...webllm.prebuiltAppConfig,
+      useIndexedDBCache: true,
+    };
+    return await webllm.CreateWebWorkerEngine(
+      new Worker(new URL("../worker.ts", import.meta.url), {
+        type: "module",
+      }),
       modelName,
       {
         initProgressCallback: (report: webllm.InitProgressReport) => {
           progressCallback(report);
         },
-        appConfig: {
-          ...webllm.prebuiltAppConfig,
-          useIndexedDBCache: true,
-        },
+        appConfig,
       }
     );
-    return engine;
   };
 
   const stream = async (
@@ -32,24 +34,26 @@ function useWebLLM() {
         {
           role: "system",
           content:
-            "You are a helpful, respectful and honest assistant. " +
-            "Be as happy as you can when speaking please. You will try to answer corectly to every question.",
+            "I am a helpful, respectful and honest assistant. " +
+            "I will try to answer corectly to every question.",
         },
         { role: "user", content: userMsg },
       ],
       temperature: 0.5,
-      max_gen_len: 256,
+      max_gen_len: 512,
     };
 
     const asyncChunkGenerator = await engine.chat.completions.create(request);
     let message = "";
+
     for await (const chunk of asyncChunkGenerator) {
       if (chunk.choices[0].delta.content) {
         // Last chunk has undefined content
         message += chunk.choices[0].delta.content;
+        answerCallback(message);
       }
-      answerCallback(message);
       // engine.interruptGenerate();  // works with interrupt as well
+      // console.log(await engine.runtimeStatsText());
     }
   };
 

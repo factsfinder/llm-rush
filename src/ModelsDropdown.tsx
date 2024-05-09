@@ -14,7 +14,7 @@ function Dropdown() {
   const closeDropdown = useCallback((e: MouseEvent): void => {
     const target = e.target as HTMLElement;
     const details = document.getElementById("modelsDropdown");
-    const detailsList = document.getElementById("modelsdropdownlist");
+    const detailsList = document.getElementById("modelsDropdownList");
     if (
       details != null &&
       (!details.contains(target) || detailsList?.contains(target))
@@ -28,6 +28,7 @@ function Dropdown() {
       return async (e: any) => {
         closeDropdown(e);
         dispatch({ type: actionTypes.SELECT_MODEL, payload: modelName });
+
         const engine = await loadEngine(modelName, (report) => {
           dispatch({
             type: actionTypes.LOADING_MODEL_PROGRESS,
@@ -67,7 +68,7 @@ function Dropdown() {
         </svg>
       </summary>
       <ul
-        id="modelsdropdownlist"
+        id="modelsDropdownList"
         className="p-2 shadow-md menu dropdown-content bg-gray-100 z-[1] rounded-box w-96"
       >
         {Object.keys(models).map((m) => (

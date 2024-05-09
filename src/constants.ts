@@ -5,12 +5,12 @@ type model = {
   };
 };
 
+// Todo: use webllm prebuiltAppConfig
 export const models: model = {
   llama: {
     modelName: "Llama-3-8B-Instruct-q4f16_1",
     displayName: "Llama-3-8B",
   },
-
   tinyllama: {
     modelName: "TinyLlama-1.1B-Chat-v0.4-q4f32_1-1k",
     displayName: "TinyLlama-1.1B",

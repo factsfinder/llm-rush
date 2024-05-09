@@ -5,7 +5,10 @@ import {
   useReducer,
   ReactNode,
   Dispatch,
+  useEffect,
 } from "react";
+
+import useIndexedDB from "./hooks/useIndexedDB";
 
 type message_sender = "user" | "assistant" | "system";
 
@@ -27,6 +30,8 @@ type appStateType = {
   messages: Array<message>;
   answer: string | null; // todo: remove after handling multiple messages
   loadingModelProgress: loadingModelType | null;
+  loading: boolean;
+  db: IDBDatabase | null;
 };
 
 const initialState: appStateType = {
@@ -35,6 +40,8 @@ const initialState: appStateType = {
   messages: [],
   answer: null, // todo: remove after handling multiple messages
   loadingModelProgress: null,
+  loading: false,
+  db: null,
 };
 
 type appContextType = {
@@ -53,6 +60,8 @@ enum actionTypes {
   UPDATE_MSG_RESPONSE = "update_msg_response",
   UPDATE_LLM_ENGINE = "update_llm_engine",
   UPDATE_ANSWER = "update_answer",
+  TOGGLE_LOADING = "toggle_loading",
+  UPDATE_DB = "update_db",
   LOADING_MODEL_PROGRESS = "loading_model_progress",
 }
 
@@ -62,6 +71,8 @@ type appActionsType =
   | { type: actionTypes.UPDATE_MSG_RESPONSE; payload: string; msg_id: number }
   | { type: actionTypes.UPDATE_ANSWER; payload: string }
   | { type: actionTypes.UPDATE_LLM_ENGINE; payload: EngineInterface }
+  | { type: actionTypes.TOGGLE_LOADING; payload: boolean }
+  | { type: actionTypes.UPDATE_DB; payload: IDBDatabase }
   | {
       type: actionTypes.LOADING_MODEL_PROGRESS;
       payload: loadingModelType | null;
@@ -78,6 +89,16 @@ function appReducer(state: appStateType, action: appActionsType) {
       return {
         ...state,
         loadingModelProgress: action.payload,
+      };
+    case actionTypes.TOGGLE_LOADING:
+      return {
+        ...state,
+        loading: action.payload,
+      };
+    case actionTypes.UPDATE_DB:
+      return {
+        ...state,
+        db: action.payload,
       };
     case actionTypes.UPDATE_LLM_ENGINE:
       return {
@@ -107,6 +128,15 @@ function appReducer(state: appStateType, action: appActionsType) {
 
 function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+
+  const { initDB } = useIndexedDB();
+
+  console.log(state.db);
+  useEffect(() => {
+    initDB("llm-rush", 1, (db) => {
+      dispatch({ type: actionTypes.UPDATE_DB, payload: db });
+    });
+  }, [dispatch]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
