@@ -92,7 +92,7 @@ function ModelsDropdown() {
       </summary>
       <ul
         id="modelsDropdownList"
-        className="p-2 shadow-md menu dropdown-content bg-gray-100 z-[1] rounded-box w-96"
+        className="p-2 shadow-md menu dropdown-content bg-gray-100 z-[1] rounded-box sm:w-96"
       >
         {Object.keys(models).map((m) => (
           <li
@@ -101,7 +101,8 @@ function ModelsDropdown() {
             onClick={handleSelectModel(models[m].modelName)}
           >
             <a>
-              <b>{models[m].displayName}:</b> {models[m].modelName}
+              <b>{models[m].displayName}</b>{" "}
+              <span className="hidden sm:block">{models[m].modelName}</span>
             </a>
           </li>
         ))}

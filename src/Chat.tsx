@@ -102,18 +102,10 @@ function ChatScreen() {
       <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl shadow-2xl bg-gray-100 h-full p-4">
         <div className="flex flex-col h-full overflow-x-auto overflow-y-auto mb-4">
           <div className="flex flex-col max-h-[40rem] h-full">
-            <div className="grid grid-cols-12 gap-y-2">
+            <div className="space-y-2">
               {messages.map(({ text, role, id }: message) => {
                 return (
-                  <div
-                    id={`msg-${id}`}
-                    key={id}
-                    className={
-                      role === "assistant"
-                        ? "col-start-1 col-end-8 p-3 rounded-lg"
-                        : "col-start-6 col-end-13 p-3 rounded-lg"
-                    }
-                  >
+                  <div id={`msg-${id}`} key={id} className="p-3 rounded-lg">
                     <div
                       className={
                         role === "assistant"
