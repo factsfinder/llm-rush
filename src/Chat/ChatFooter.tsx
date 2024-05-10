@@ -7,7 +7,7 @@ function ChatFooter() {
   const inputRef = useRef<any>();
 
   const { state, dispatch } = useAppContext();
-  const { db, engine, messages } = state;
+  const { db, engine } = state;
 
   const { stream } = useWebLLM();
 
