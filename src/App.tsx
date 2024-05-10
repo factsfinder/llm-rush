@@ -1,6 +1,5 @@
 import { useAppContext } from "./context";
-import ModelsDropdown from "./ModelsDropdown";
-import ChatScreen from "./Chat";
+import ChatScreen from "./Chat/index";
 import Loading from "./Loading";
 
 function App() {
@@ -12,9 +11,7 @@ function App() {
           <h1 className="font-extrabold text-2xl mx-auto text-black">
             LLM Rush
           </h1>
-          {!!state.engine && <ModelsDropdown />}
         </div>
-
         <ChatScreen />
       </div>
       {state.loading && <Loading />}
